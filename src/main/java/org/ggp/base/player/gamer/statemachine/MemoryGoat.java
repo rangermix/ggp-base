@@ -411,7 +411,13 @@ public class MemoryGoat extends XStateMachineGamer {
 				List<List<Move>> jointMoves = n.legalJointMoves.get(move);
 				EPSILON = 1.0 * (finishBy - System.currentTimeMillis()) / (finishBy - startedAt);
 				if (rand.nextDouble() < EPSILON) {
-					maxChild = n.children.get(rand.nextInt(jointMoves.size()));
+					XNodeLight succNode = n.children.get(rand.nextInt(jointMoves.size()));
+					if (succNode.visits == 0) {
+						++succNode.visits;
+						path.add(succNode);
+						return;
+					}
+					maxChild = succNode;
 					break;
 				}
 				double minValue = Double.NEGATIVE_INFINITY;
