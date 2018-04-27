@@ -37,6 +37,7 @@ public class MemoryGoat extends XStateMachineGamer {
 	private int self_index, num_threads;
 	private volatile int depthCharges, last_depthCharges;
 	private long finishBy;
+	private long startedAt;
 	private volatile XNodeLight root;
 	private volatile XNodeLight rootAbsolute;
 	private List<XNodeLight> path;
@@ -157,6 +158,7 @@ public class MemoryGoat extends XStateMachineGamer {
 		play_loops = 0;
 		System.out.println("Background Depth Charges: " + last_depthCharges);
 		finishBy = timeout - 2500;
+		startedAt = System.currentTimeMillis();
 		return MCTS();
 	}
 
@@ -406,6 +408,12 @@ public class MemoryGoat extends XStateMachineGamer {
 			int size = n.legalMoves.length;
 			for(int i = 0; i < size; ++i) {
 				Move move = n.legalMoves[i];
+				List<List<Move>> jointMoves = n.legalJointMoves.get(move);
+				EPSILON = 1.0 * (finishBy - System.currentTimeMillis()) / (finishBy - startedAt);
+				if (rand.nextDouble() < EPSILON) {
+					maxChild = n.children.get(rand.nextInt(jointMoves.size()));
+					break;
+				}
 				double minValue = Double.NEGATIVE_INFINITY;
 				XNodeLight minChild = null;
 				for (List<Move> jointMove : n.legalJointMoves.get(move)) {
@@ -420,20 +428,12 @@ public class MemoryGoat extends XStateMachineGamer {
 					if (nodeValue > minValue) {
 						minValue = nodeValue;
 						minChild = succNode;
-					} else if (rand.nextDouble() < EPSILON) {
-						minValue = nodeValue;
-						minChild = succNode;
-						break;
 					}
 				}
 				minValue = uctMax(minChild, parentVal);
 				if (minValue > maxValue) {
 					maxValue = minValue;
 					maxChild = minChild;
-				} else if  (rand.nextDouble() < EPSILON) {
-					maxValue = minValue;
-					maxChild = minChild;
-					break;
 				}
 			}
 			path.add(maxChild);
