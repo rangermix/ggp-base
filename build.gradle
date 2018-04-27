@@ -19,6 +19,7 @@ dependencies {
         'lib/javassist/javassist.jar',
         'lib/reflections/reflections-0.9.9-RC1.jar',
         'lib/Htmlparser/htmlparser-1.4.jar',
+        'lib/apache-lucene.jar'
     )
     testCompile files(
         'lib/JUnit/junit-4.11.jar',
@@ -92,7 +93,8 @@ task clojureGamer(type: JavaExec) {
 }
 */
 
-def playerJvmArgs = ['-mx1500m',
+def playerJvmArgs = ['-mx230g',
+        '-Xms200g',
         '-server',
         '-XX:-DontCompileHugeMethods',
         '-XX:MinHeapFreeRatio=10',

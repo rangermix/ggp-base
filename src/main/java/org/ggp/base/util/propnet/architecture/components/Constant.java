@@ -41,4 +41,10 @@ public final class Constant extends Component
 	{
 		return toDot("doublecircle", "grey", Boolean.toString(value).toUpperCase());
 	}
+
+	@Override
+	public String bitString(int cValue) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

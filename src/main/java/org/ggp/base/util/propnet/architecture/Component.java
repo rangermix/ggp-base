@@ -129,6 +129,16 @@ public abstract class Component implements Serializable
     @Override
     public abstract String toString();
 
+    private static final int CURR_VAL_MASK = 0x8000_0000;
+
+    protected boolean get_current_value(int value) {
+    	return (value & CURR_VAL_MASK) != 0;
+    }
+
+    public abstract String bitString(int cValue);
+
+
+
     /**
      * Returns a configurable representation of the Component in .dot format.
      *

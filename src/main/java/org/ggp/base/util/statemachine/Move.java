@@ -14,10 +14,11 @@ import org.ggp.base.util.symbol.factory.exceptions.SymbolFormatException;
  * Note that Move objects are not intrinsically tied to a role. They
  * only express the action itself.
  */
-@SuppressWarnings("serial")
+
 public class Move implements Serializable
 {
-    protected final GdlTerm contents;
+	private static final long serialVersionUID = -4388086774182311769L;
+	protected final GdlTerm contents;
 
     public Move(GdlTerm contents)
     {

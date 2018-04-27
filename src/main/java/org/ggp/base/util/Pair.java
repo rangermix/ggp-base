@@ -1,8 +1,12 @@
 package org.ggp.base.util;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class Pair <L, R> {
+public class Pair <L, R> implements Serializable {
+
+	private static final long serialVersionUID = 8370157771281820299L;
+
 	public final L left;
 	public final R right;
 

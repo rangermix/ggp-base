@@ -34,4 +34,10 @@ public final class Or extends Component
 	{
 		return toDot("ellipse", "grey", "OR");
 	}
+
+	@Override
+	public String bitString(int cValue) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

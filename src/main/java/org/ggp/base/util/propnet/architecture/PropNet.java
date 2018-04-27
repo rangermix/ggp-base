@@ -3,6 +3,7 @@ package org.ggp.base.util.propnet.architecture;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -66,8 +67,10 @@ import org.ggp.base.util.statemachine.Role;
  * @author Sam Schreiber
  */
 
-public final class PropNet
+public final class PropNet implements Serializable
 {
+	private static final long serialVersionUID = -7440617479253503575L;
+
 	/** References to every component in the PropNet. */
 	private final Set<Component> components;
 
