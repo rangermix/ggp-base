@@ -7,9 +7,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -38,7 +40,7 @@ public class MemoryGoat extends XStateMachineGamer {
 	private volatile int depthCharges, last_depthCharges;
 	private long finishBy;
 	private long startedAt;
-	private int num_roots = 2;
+	private int num_roots;
 	private volatile XNodeLight[] roots;
 	private volatile XNodeLight[] rootsAbsolute;
 	private volatile XNodeLight rootSavedAbsolute;
@@ -51,7 +53,7 @@ public class MemoryGoat extends XStateMachineGamer {
 	private ThreadStateMachine background_machine;
 	private ThreadStateMachine solver_machine;
 	private volatile int num_charges, num_per;
-	private Map<OpenBitSet, XNodeLight> graph;
+	private Map<OpenBitSet, Set<XNodeLight>> graph;
 	private volatile double total_background = 0;
 	private volatile double total_threadpool = 0;
 	private volatile int loops = 0;
@@ -111,10 +113,9 @@ public class MemoryGoat extends XStateMachineGamer {
 	}
 
 	protected void initialize(long timeout) throws MoveDefinitionException, TransitionDefinitionException, InterruptedException {
-		/*graph = loadGraph();
-		if (graph == null) {
-				graph = new HashMap<OpenBitSet, XNodeLight>();
-		}*/
+		graph = new HashMap<>();
+		num_roots = 2;
+
 		machine = getStateMachine();
 		roles = machine.getRoles();
 		self_index = roles.indexOf(getRole());
@@ -125,14 +126,11 @@ public class MemoryGoat extends XStateMachineGamer {
 		rootsAbsolute = new XNodeLight[num_roots+1];
 		roots = new XNodeLight[num_roots+1];
 		for (int i = 0; i < num_roots; ++i) {
-			rootsAbsolute[i] = new XNodeLight(getCurrentState(), roles.size());
+			rootsAbsolute[i] = generateXNode(getCurrentState(), roles.size());
 			roots[i] = rootsAbsolute[i];
 			Expand(roots[i]);
 		}
 
-
-		//rootAbsolute = new XNodeLight(getCurrentState(), roles.size());
-		//root = rootAbsolute;
 
 		num_charges = 1;
 		num_per = Runtime.getRuntime().availableProcessors();
@@ -146,11 +144,12 @@ public class MemoryGoat extends XStateMachineGamer {
 		background_machine = new ThreadStateMachine(machine,self_index);
 
 		if (rootSavedAbsolute == null) {
-			rootSavedAbsolute = new XNodeLight(getCurrentState(), roles.size());
+			++num_roots;
+			rootSavedAbsolute = generateXNode(getCurrentState(), roles.size());
 			Expand(rootSavedAbsolute);
 		}
-		rootsAbsolute[num_roots] = rootSavedAbsolute;
-		roots[num_roots] = rootSavedAbsolute;
+		rootsAbsolute[rootsAbsolute.length-1] = rootSavedAbsolute;
+		roots[roots.length-1] = rootSavedAbsolute;
 
 		thread = new Thread(new runMCTS());
 		depthCharges = 0;
@@ -195,7 +194,7 @@ public class MemoryGoat extends XStateMachineGamer {
 			}
 			if (!found_next) {
 				System.out.println("ERROR. Current State not in tree");
-				roots[i] = new XNodeLight(currentState, roles.size());
+				roots[i] = generateXNode(currentState, roles.size());
 			}
 		}
 	}
@@ -277,7 +276,7 @@ public class MemoryGoat extends XStateMachineGamer {
 			XNodeLight root_thread;
 			while (true) {
 				double start = System.currentTimeMillis();
-				root_thread = roots[rand.nextInt(roots.length)];
+				root_thread = roots[rand.nextInt(num_roots)];
 				path = new ArrayList<XNodeLight>();
 				path.add(root_thread);
 				//double select_start = System.currentTimeMillis();
@@ -534,10 +533,9 @@ public class MemoryGoat extends XStateMachineGamer {
 				//XNodeLight child = graph.get(state);
 				XNodeLight child = n.children.get(jointMove);
 				if(child == null) {
-					child = new XNodeLight(state, roles.size());
+					child = generateXNode(state, roles.size());
 					n.legalJointMoves.get(jointMove.get(self_index)).add(jointMove);
 					n.children.put(jointMove, child);
-					//graph.put(state, child);
 				}
 
 			}
@@ -560,12 +558,10 @@ public class MemoryGoat extends XStateMachineGamer {
 			for (List<Move> jointMove: machine.getLegalJointMoves(n.state)) {
 				OpenBitSet state = machine.getNextState(n.state, jointMove);
 				XNodeLight child = n.children.get(jointMove);
-				//XNodeLight child = graph.get(state);
 				if(child == null) {
-					child = new XNodeLight(state, roles.size());
+					child = generateXNode(state, roles.size());
 					n.legalJointMoves.get(jointMove.get(self_index)).add(jointMove);
 					n.children.put(jointMove, child);
-					//graph.put(state, child);
 				}
 
 			}
@@ -666,6 +662,18 @@ public class MemoryGoat extends XStateMachineGamer {
         } catch(IOException ex) {
             System.out.println("IOException when writing to file " + filename);
         }
+	}
+
+	//construct a new XNode object, while maintaining the graph mapping structure
+	protected XNodeLight generateXNode(OpenBitSet state, int numRoles) {
+		XNodeLight node = new XNodeLight(state, numRoles);
+		Set<XNodeLight> stateNodes = graph.get(state);
+		if (stateNodes == null) {
+			stateNodes = new HashSet<XNodeLight>();
+		}
+		stateNodes.add(node);
+
+		return node;
 	}
 
 	@SuppressWarnings("unchecked")
