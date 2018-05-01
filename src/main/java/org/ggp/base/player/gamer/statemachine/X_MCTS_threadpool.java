@@ -302,7 +302,7 @@ public class X_MCTS_threadpool extends XStateMachineGamer {
 			for (int i = 0; i < num; ++i) {
 				//double start = System.currentTimeMillis();
 				try {
-					curr = mac.Playout(node);
+					curr = mac.Playout(node)[self_index];
 				} catch (MoveDefinitionException | TransitionDefinitionException | GoalDefinitionException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

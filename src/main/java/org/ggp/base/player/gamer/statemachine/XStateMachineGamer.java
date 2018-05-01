@@ -189,7 +189,7 @@ public abstract class XStateMachineGamer extends Gamer
 		try
 		{
 			stateMachine = getInitialStateMachine();
-			if (loadStateMachine() == null) {
+			if (stateMachine.propNet == null) {
 				stateMachine.initialize(getMatch().getGame().getRules());
 			}
 			currentState = stateMachine.getInitialState();

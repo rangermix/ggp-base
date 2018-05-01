@@ -597,6 +597,16 @@ public class ThreadStateMachine extends XMachine {
         return 0;
     }
 
+	public double[] getCurrGoal(OpenBitSet state)
+            throws GoalDefinitionException {
+
+		double[] rewards = new double[machine.roles.length];
+		for (int i = 0; i < machine.roles.length; ++i) {
+			rewards[i] = getCurrGoal(state, i);
+		}
+		return rewards;
+	}
+
 	public OpenBitSet getNextStateBit(OpenBitSet state, OpenBitSet moves) {
 
 		setBases((OpenBitSet)state.clone());
@@ -641,12 +651,12 @@ public class ThreadStateMachine extends XMachine {
 
     }
 
-	public double Playout(XNodeAbstract n) throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException {
+	public double[] Playout(XNodeAbstract n) throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException {
 		OpenBitSet state = n.state;
 		while(!isTerminal(state)) {
 			state = getRandomNextState(state);
 		}
-		return getCurrGoal(state, self_index);
+		return getCurrGoal(state);
 	}
 
 

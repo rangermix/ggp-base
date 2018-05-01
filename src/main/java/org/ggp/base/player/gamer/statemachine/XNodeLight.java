@@ -12,12 +12,12 @@ public class XNodeLight extends XNodeAbstract implements Serializable {
 
 
 	private static final long serialVersionUID = -8233477291312873815L;
-	public XNodeLight(OpenBitSet state) {
+	public XNodeLight(OpenBitSet state, int numRoles) {
 		this.state = state;
 		this.children = new HashMap<List<Move>, XNodeLight>();
 		this.legalJointMoves = new HashMap<Move, List<List<Move>>>();
 
-		this.utility = 0;
+		this.utility = new double[numRoles];
 		this.visits = 0;
 		this.updates = 0;
 		//this.sum_x = 0;
@@ -26,7 +26,7 @@ public class XNodeLight extends XNodeAbstract implements Serializable {
 		//this.C_CONST = 60;
 		this.expanded = false;
 	}
-	public volatile double utility;
+	public volatile double[] utility;
 	public volatile double visits;
 	public volatile double updates;
 	public volatile boolean expanded;
