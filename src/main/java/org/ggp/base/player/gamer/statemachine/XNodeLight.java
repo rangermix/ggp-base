@@ -3,10 +3,11 @@ package org.ggp.base.player.gamer.statemachine;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.util.OpenBitSet;
 import org.ggp.base.util.statemachine.Move;
+import org.ggp.base.util.statemachine.XStateMachine;
+import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 
 public class XNodeLight extends XNodeAbstract implements Serializable {
 
@@ -36,7 +37,47 @@ public class XNodeLight extends XNodeAbstract implements Serializable {
 	//public volatile int n;
 	//public volatile double C_CONST;
 	//dont serialize these
-	public transient volatile AtomicBoolean started = new AtomicBoolean(false);
-	public transient volatile HashMap<Move, List<List<Move>>> legalJointMoves;
-	public transient volatile Move[] legalMoves;
+	//private transient volatile AtomicBoolean started = new AtomicBoolean(false);
+	private transient volatile HashMap<Move, List<List<Move>>> legalJointMoves;
+	private transient volatile Move[] legalMoves;
+
+	/*public AtomicBoolean isStarted(XStateMachine machine, int index) throws MoveDefinitionException {
+		if (started == null) {
+			reinitializeTransient(machine, index);
+		}
+		return started;
+	}*/
+
+	public HashMap<Move, List<List<Move>>> getLegalJointMoves(XStateMachine machine, int index) throws MoveDefinitionException {
+		if (legalJointMoves == null) {
+			reinitializeTransient(machine, index);
+		}
+		return legalJointMoves;
+	}
+
+	public Move[] getLegalMoves(XStateMachine machine, int index) throws MoveDefinitionException {
+		if (legalMoves == null) {
+			reinitializeTransient(machine, index);
+		}
+		return legalMoves;
+	}
+
+	public void setLegalMoves(Move[] moves) {
+		legalMoves = moves;
+	}
+
+
+	private void reinitializeTransient(XStateMachine machine, int index) throws MoveDefinitionException {
+
+		//reinitialize transient elements
+		List<Move> legalMovesList = machine.getLegalMoves(state, index);
+		legalMoves = legalMovesList.toArray(new Move[legalMovesList.size()]);
+
+		legalJointMoves = new HashMap<Move, List<List<Move>>>();
+		for (Move move : legalMoves) {
+			List<List<Move>> legalJointMovesList = machine.getLegalJointMoves(state, index, move);
+			legalJointMoves.put(move, legalJointMovesList);
+		}
+	}
+
 }

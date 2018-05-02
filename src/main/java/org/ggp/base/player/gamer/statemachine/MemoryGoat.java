@@ -66,6 +66,9 @@ public class MemoryGoat extends XStateMachineGamer {
 	private volatile double EPSILON = .1;
 	private Random rand = new Random();
 
+	protected List<XNodeLight> matchPath;
+
+
 	public class Struct {
 		public double[] v;
 		public List<XNodeLight> p;
@@ -114,7 +117,8 @@ public class MemoryGoat extends XStateMachineGamer {
 
 	protected void initialize(long timeout) throws MoveDefinitionException, TransitionDefinitionException, InterruptedException {
 		graph = new HashMap<>();
-		num_roots = 2;
+		matchPath = new ArrayList<XNodeLight>();
+		num_roots = 8;
 
 		machine = getStateMachine();
 		roles = machine.getRoles();
@@ -144,7 +148,6 @@ public class MemoryGoat extends XStateMachineGamer {
 		background_machine = new ThreadStateMachine(machine,self_index);
 
 		if (rootSavedAbsolute == null) {
-			++num_roots;
 			rootSavedAbsolute = generateXNode(getCurrentState(), roles.size());
 			Expand(rootSavedAbsolute);
 		}
@@ -174,11 +177,13 @@ public class MemoryGoat extends XStateMachineGamer {
 		System.out.println("Background Depth Charges: " + last_depthCharges);
 		finishBy = timeout - 2500;
 		startedAt = System.currentTimeMillis();
+
 		return MCTS();
 	}
 
 	protected void initializeMCTS() throws MoveDefinitionException, TransitionDefinitionException, InterruptedException {
 		OpenBitSet currentState = getCurrentState();
+
 		for (int i = 0; i < roots.length; ++i) {
 			if (roots[i] == null) System.out.println("NULL ROOT");
 			if (roots[i].state.equals(currentState)) continue;
@@ -197,6 +202,21 @@ public class MemoryGoat extends XStateMachineGamer {
 				roots[i] = generateXNode(currentState, roles.size());
 			}
 		}
+
+		matchPath.add(roots[roots.length-1]);
+
+		//restart the worst root
+		int worstRoot = 0;
+		double worstScore = 100.1;
+		for (int i=0; i < num_roots; ++i) {
+			double utility = roots[i].utility[self_index] / roots[i].updates;
+			if (utility < worstScore) {
+				worstRoot = i;
+				worstScore = utility;
+			}
+		}
+		System.out.println("Restarting Root at index " + worstRoot);
+		roots[worstRoot] = generateXNode(currentState, roles.size());
 	}
 
 	protected Move MCTS() throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException, InterruptedException, ExecutionException {
@@ -276,9 +296,14 @@ public class MemoryGoat extends XStateMachineGamer {
 			XNodeLight root_thread;
 			while (true) {
 				double start = System.currentTimeMillis();
-				root_thread = roots[rand.nextInt(num_roots)];
+				int rand_idx = rand.nextInt(roots.length);
+				root_thread = roots[rand_idx];
 				path = new ArrayList<XNodeLight>();
-				path.add(root_thread);
+				if (rand_idx == num_roots && !matchPath.isEmpty()) {
+					path.addAll(matchPath);
+				} else {
+					path.add(root_thread);
+				}
 				//double select_start = System.currentTimeMillis();
 				try {
 					Select(root_thread, path);
@@ -366,14 +391,15 @@ public class MemoryGoat extends XStateMachineGamer {
 
 	protected Move bestMove() throws MoveDefinitionException {
 		double maxValue = Double.NEGATIVE_INFINITY;
-		Move maxMove = roots[roots.length-1].legalMoves[0];
+		Move maxMove = roots[roots.length-1].getLegalMoves(machine, self_index)[0];
+
 		for (XNodeLight n : roots) {
-			int size = n.legalMoves.length;
+			int size = n.getLegalMoves(machine, self_index).length;
 			for(int i = 0; i < size; ++i) {
-				Move move = n.legalMoves[i];
+				Move move = n.getLegalMoves(machine, self_index)[i];
 				double minValue = Double.POSITIVE_INFINITY;
 				double visits = 0;
-				for (List<Move> jointMove : n.legalJointMoves.get(move)) {
+				for (List<Move> jointMove : n.getLegalJointMoves(machine, self_index).get(move)) {
 					XNodeLight succNode = n.children.get(jointMove);
 					if (succNode.updates != 0) {
 						double nodeValue = succNode.utility[self_index] / succNode.updates;
@@ -392,6 +418,7 @@ public class MemoryGoat extends XStateMachineGamer {
 			System.out.println("--");
 		}
 		System.out.println(getName() + " Max Move: " + maxMove + " Max Value: " + maxValue);
+
 		return maxMove;
 	}
 
@@ -424,22 +451,11 @@ public class MemoryGoat extends XStateMachineGamer {
 			double parentVal = C_CONST * Math.sqrt(Math.log(n.visits));
 			XNodeLight maxChild = null;
 
-			//reinitialize transient elements
-			if (n.legalMoves == null) {
-				List<Move> legalMoves = background_machine.getLegalMoves(n.state, self_index);
-				n.legalMoves = legalMoves.toArray(new Move[legalMoves.size()]);
-
-				n.legalJointMoves = new HashMap<Move, List<List<Move>>>();
-				for (Move move : legalMoves) {
-					List<List<Move>> legalJointMoves = background_machine.getLegalJointMoves(n.state, self_index, move);
-					n.legalJointMoves.put(move, legalJointMoves);
-				}
-			}
-
-			int size = n.legalMoves.length;
+			int size = n.getLegalMoves(machine, self_index).length;
 
 			//select a random move with decaying probability
-			List<List<Move>> jointMoves = n.legalJointMoves.get(n.legalMoves[rand.nextInt(size)]);
+			List<List<Move>> jointMoves = n.getLegalJointMoves(machine, self_index)
+										   .get(n.getLegalMoves(machine, self_index)[rand.nextInt(size)]);
 			EPSILON = .1 * (finishBy - System.currentTimeMillis()) / (finishBy - startedAt);
 			if (rand.nextDouble() < EPSILON) {
 				//System.out.println("RANDOM EPSILON SELECT");
@@ -456,11 +472,11 @@ public class MemoryGoat extends XStateMachineGamer {
 			}
 
 			for(int i = 0; i < size; ++i) {
-				Move move = n.legalMoves[i];
+				Move move = n.getLegalMoves(machine, self_index)[i];
 
 				double minValue = Double.NEGATIVE_INFINITY;
 				XNodeLight minChild = null;
-				for (List<Move> jointMove : n.legalJointMoves.get(move)) {
+				for (List<Move> jointMove : n.getLegalJointMoves(machine, self_index).get(move)) {
 					XNodeLight succNode = n.children.get(jointMove);
 					if (succNode.visits == 0) {
 						++succNode.visits;
@@ -510,23 +526,12 @@ public class MemoryGoat extends XStateMachineGamer {
 		if (n.children.isEmpty() && !background_machine.isTerminal(n.state)) {
 			List<Move> moves = background_machine.getLegalMoves(n.state, self_index);
 			int size = moves.size();
-			n.legalMoves = moves.toArray(new Move[size]);
+			n.setLegalMoves(moves.toArray(new Move[size]));
 
-			//reinitialize transient elements
-			if (n.legalJointMoves == null) {
-				List<Move> legalMoves = background_machine.getLegalMoves(n.state, self_index);
-				n.legalMoves = legalMoves.toArray(new Move[legalMoves.size()]);
-
-				n.legalJointMoves = new HashMap<Move, List<List<Move>>>();
-				for (Move move : legalMoves) {
-					List<List<Move>> legalJointMoves = background_machine.getLegalJointMoves(n.state, self_index, move);
-					n.legalJointMoves.put(move, legalJointMoves);
-				}
-			}
 
 			for (int i = 0; i < size; ++i) {
-				Move move = n.legalMoves[i];
-				n.legalJointMoves.put(move, new ArrayList<List<Move>>());
+				Move move = n.getLegalMoves(machine, self_index)[i];
+				n.getLegalJointMoves(machine, self_index).put(move, new ArrayList<List<Move>>());
 			}
 			for (List<Move> jointMove: background_machine.getLegalJointMoves(n.state)) {
 				OpenBitSet state = background_machine.getNextState(n.state, jointMove);
@@ -534,7 +539,7 @@ public class MemoryGoat extends XStateMachineGamer {
 				XNodeLight child = n.children.get(jointMove);
 				if(child == null) {
 					child = generateXNode(state, roles.size());
-					n.legalJointMoves.get(jointMove.get(self_index)).add(jointMove);
+					n.getLegalJointMoves(machine, self_index).get(jointMove.get(self_index)).add(jointMove);
 					n.children.put(jointMove, child);
 				}
 
@@ -550,17 +555,17 @@ public class MemoryGoat extends XStateMachineGamer {
 		if (n.children.isEmpty() && !machine.isTerminal(n.state)) {
 			List<Move> moves = machine.getLegalMoves(n.state, self_index);
 			int size = moves.size();
-			n.legalMoves = moves.toArray(new Move[size]);
+			n.setLegalMoves(moves.toArray(new Move[size]));
 			for (int i = 0; i < size; ++i) {
-				Move move = n.legalMoves[i];
-				n.legalJointMoves.put(move, new ArrayList<List<Move>>());
+				Move move = n.getLegalMoves(machine, self_index)[i];
+				n.getLegalJointMoves(machine, self_index).put(move, new ArrayList<List<Move>>());
 			}
 			for (List<Move> jointMove: machine.getLegalJointMoves(n.state)) {
 				OpenBitSet state = machine.getNextState(n.state, jointMove);
 				XNodeLight child = n.children.get(jointMove);
 				if(child == null) {
 					child = generateXNode(state, roles.size());
-					n.legalJointMoves.get(jointMove.get(self_index)).add(jointMove);
+					n.getLegalJointMoves(machine, self_index).get(jointMove.get(self_index)).add(jointMove);
 					n.children.put(jointMove, child);
 				}
 

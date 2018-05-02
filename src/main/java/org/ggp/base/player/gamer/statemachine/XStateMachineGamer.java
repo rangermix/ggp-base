@@ -178,6 +178,7 @@ public abstract class XStateMachineGamer extends Gamer
 	// new stateMachineMetaGame() and stateMachineSelectMove() functions after
 	// doing the state-machine-related book-keeping.
 
+
 	/**
 	 * A wrapper function for stateMachineMetaGame. When the match begins, this
 	 * initializes the state machine and role using the match description, and
