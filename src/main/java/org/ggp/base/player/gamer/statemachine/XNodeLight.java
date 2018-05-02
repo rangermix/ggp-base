@@ -19,8 +19,8 @@ public class XNodeLight extends XNodeAbstract implements Serializable {
 		this.legalJointMoves = new HashMap<Move, List<List<Move>>>();
 
 		this.utility = new double[numRoles];
-		this.visits = 0;
-		this.updates = 0;
+		this.visits = 0.;
+		this.updates = 0.;
 		//this.sum_x = 0;
 		//this.sum_x2 = 0;
 		//this.n = 0;

@@ -118,7 +118,7 @@ public class MemoryGoat extends XStateMachineGamer {
 	protected void initialize(long timeout) throws MoveDefinitionException, TransitionDefinitionException, InterruptedException {
 		graph = new HashMap<>();
 		matchPath = new ArrayList<XNodeLight>();
-		num_roots = 8;
+		num_roots = 4;
 
 		machine = getStateMachine();
 		roles = machine.getRoles();
