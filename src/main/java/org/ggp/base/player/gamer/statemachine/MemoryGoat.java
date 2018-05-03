@@ -126,6 +126,7 @@ public class MemoryGoat extends XStateMachineGamer {
 
 		//lets load the tree here
 		rootSavedAbsolute = loadTree();
+		System.out.println("Number of loaded nodes: " + XNodeLight.nodeCount);
 
 		rootsAbsolute = new XNodeLight[num_roots+1];
 		roots = new XNodeLight[num_roots+1];
@@ -577,20 +578,22 @@ public class MemoryGoat extends XStateMachineGamer {
 
 	@Override
 	public void stateMachineStop() {
-		thread_pool.shutdownNow();
-		thread.stop();
 		saveTree();
 		//saveGraph();
 		saveMachine();
+		cleanup();
 	}
 
 	@Override
 	public void stateMachineAbort() {
+		cleanup();
+	}
+
+	protected void cleanup() {
+
 		thread_pool.shutdownNow();
 		thread.stop();
-		saveTree();
-		//saveGraph();
-		saveMachine();
+		XNodeLight.nodeCount = 0;
 	}
 
 	protected void saveTree() {

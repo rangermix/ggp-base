@@ -11,6 +11,8 @@ import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 
 public class XNodeLight extends XNodeAbstract implements Serializable {
 
+	public static int nodeCount = 0;
+
 
 	private static final long serialVersionUID = -8233477291312873815L;
 	public XNodeLight(OpenBitSet state, int numRoles) {
@@ -26,6 +28,8 @@ public class XNodeLight extends XNodeAbstract implements Serializable {
 		//this.n = 0;
 		//this.C_CONST = 60;
 		this.expanded = false;
+
+		++nodeCount;
 	}
 	public volatile double[] utility;
 	public volatile double visits;
