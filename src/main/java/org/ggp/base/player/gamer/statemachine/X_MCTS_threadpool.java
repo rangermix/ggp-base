@@ -18,6 +18,7 @@ import org.apache.lucene.util.OpenBitSet;
 import org.ggp.base.apps.player.Player;
 import org.ggp.base.player.gamer.exception.GamePreviewException;
 import org.ggp.base.util.game.Game;
+import org.ggp.base.util.gdl.grammar.GdlPool;
 import org.ggp.base.util.statemachine.Move;
 import org.ggp.base.util.statemachine.Role;
 import org.ggp.base.util.statemachine.ThreadStateMachine;
@@ -468,8 +469,10 @@ public class X_MCTS_threadpool extends XStateMachineGamer {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void stateMachineStop() {
+		GdlPool.drainPool();
 		thread_pool.shutdownNow();
 		thread.stop();
+		GdlPool.drainPool();
 	}
 
 	@SuppressWarnings("deprecation")
@@ -478,6 +481,7 @@ public class X_MCTS_threadpool extends XStateMachineGamer {
 		// TODO Auto-generated method stub
 		thread_pool.shutdownNow();
 		thread.stop();
+		GdlPool.drainPool();
 	}
 
 
