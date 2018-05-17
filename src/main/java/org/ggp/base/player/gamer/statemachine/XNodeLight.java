@@ -3,6 +3,8 @@ package org.ggp.base.player.gamer.statemachine;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.util.OpenBitSet;
 import org.ggp.base.util.statemachine.Move;
@@ -11,38 +13,37 @@ import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 
 public class XNodeLight extends XNodeAbstract implements Serializable {
 
-	public static int nodeCount = 0;
-
-
 	private static final long serialVersionUID = -8233477291312873815L;
-	public XNodeLight(OpenBitSet state, int numRoles) {
+	public XNodeLight(OpenBitSet state, double visits, double updates, double[] utility) {
 		this.state = state;
-		this.children = new HashMap<List<Move>, XNodeLight>();
-		this.legalJointMoves = new HashMap<Move, List<List<Move>>>();
+		this.children = new ConcurrentHashMap<List<Move>, XNodeLight>();
+		this.legalJointMoves = new ConcurrentHashMap<Move, List<List<Move>>>();
 
-		this.utility = new double[numRoles];
-		this.visits = 0.;
-		this.updates = 0.;
+		this.utility = utility;
+		this.visits = visits;
+		this.updates = updates;
 		//this.sum_x = 0;
 		//this.sum_x2 = 0;
 		//this.n = 0;
 		//this.C_CONST = 60;
-		this.expanded = false;
+		//this.expanded = false;
+	}
 
-		++nodeCount;
+	public XNodeLight(OpenBitSet state, int numRoles) {
+		this(state, 0., 0., new double[numRoles]);
 	}
 	public volatile double[] utility;
 	public volatile double visits;
 	public volatile double updates;
-	public volatile boolean expanded;
-	public volatile HashMap<List<Move>, XNodeLight> children;
+	//public volatile boolean expanded;
 	//public volatile double sum_x;
 	//public volatile double sum_x2;
 	//public volatile int n;
 	//public volatile double C_CONST;
 	//dont serialize these
 	//private transient volatile AtomicBoolean started = new AtomicBoolean(false);
-	private transient volatile HashMap<Move, List<List<Move>>> legalJointMoves;
+	private transient volatile Map<List<Move>, XNodeLight> children;
+	private transient volatile Map<Move, List<List<Move>>> legalJointMoves;
 	private transient volatile Move[] legalMoves;
 
 	/*public AtomicBoolean isStarted(XStateMachine machine, int index) throws MoveDefinitionException {
@@ -52,7 +53,14 @@ public class XNodeLight extends XNodeAbstract implements Serializable {
 		return started;
 	}*/
 
-	public HashMap<Move, List<List<Move>>> getLegalJointMoves(XStateMachine machine, int index) throws MoveDefinitionException {
+	public Map<List<Move>, XNodeLight> getChildren(XStateMachine machine, int index) throws MoveDefinitionException {
+		if (children == null) {
+			reinitializeTransient(machine, index);
+		}
+		return children;
+	}
+
+	public Map<Move, List<List<Move>>> getLegalJointMoves(XStateMachine machine, int index) throws MoveDefinitionException {
 		if (legalJointMoves == null) {
 			reinitializeTransient(machine, index);
 		}
@@ -82,6 +90,7 @@ public class XNodeLight extends XNodeAbstract implements Serializable {
 			List<List<Move>> legalJointMovesList = machine.getLegalJointMoves(state, index, move);
 			legalJointMoves.put(move, legalJointMovesList);
 		}
+		children = new HashMap<List<Move>, XNodeLight>();
 	}
 
 }
