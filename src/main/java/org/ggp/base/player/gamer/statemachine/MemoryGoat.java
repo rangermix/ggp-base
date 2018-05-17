@@ -448,22 +448,24 @@ public class MemoryGoat extends XStateMachineGamer {
 			int size = n.getLegalMoves(machine, self_index).length;
 			for(int i = 0; i < size; ++i) {
 				Move move = n.getLegalMoves(machine, self_index)[i];
-				double minValue = Double.NEGATIVE_INFINITY;
+				double oppValue = Double.NEGATIVE_INFINITY;
+				double myValue = Double.NEGATIVE_INFINITY;
 				double visits = 0;
 				for (List<Move> jointMove : n.getLegalJointMoves(machine, self_index).get(move)) {
 					XNodeLight succNode = n.getChildren(machine, self_index).get(jointMove);
 					if (succNode.updates != 0) {
 						//double nodeValue = succNode.utility[self_index] / succNode.updates;
 						double nodeValue = averageOpponentUtility(succNode);
-						if (nodeValue > minValue) {
+						if (nodeValue > oppValue) {
 							visits = succNode.updates;
-							minValue = nodeValue;
+							oppValue = nodeValue;
+							myValue = succNode.utility[self_index] / succNode.updates;
 						}
 					}
 				}
-				System.out.println("Move: " + move + " Value: " + (minValue == Double.NEGATIVE_INFINITY ? "N/A" : String.valueOf(minValue)) + " Visits: " + visits);
-				if (minValue > maxValue && minValue != Double.NEGATIVE_INFINITY) {
-					maxValue = minValue;
+				System.out.println("Move: " + move + " Value: " + (myValue == Double.NEGATIVE_INFINITY ? "N/A" : String.valueOf(myValue)) + " Visits: " + visits);
+				if (myValue > maxValue && myValue != Double.NEGATIVE_INFINITY) {
+					maxValue = myValue;
 					maxMove = move;
 					maxIdx = root_idx;
 					if (root_idx == num_roots) {
