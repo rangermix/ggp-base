@@ -8,12 +8,11 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Random;
+import java.util.Stack;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -121,13 +120,13 @@ public class MemoryGoat extends XStateMachineGamer {
 		int nodes_searched = 1;
 		int nodes_expanded = 1;
 		int depth = 0;
-		Queue<XNodeLight> q = new LinkedList<XNodeLight>();
-		Queue<Integer> q_d = new LinkedList<Integer>();
-		q.add(roots[num_roots]);
-		q_d.add(1);
-		while (!q.isEmpty()) {
-			XNodeLight n = q.poll();
-			Integer d = q_d.poll();
+		Stack<XNodeLight> q = new Stack<XNodeLight>();
+		Stack<Integer> q_d = new Stack<Integer>();
+		q.push(roots[num_roots]);
+		q_d.push(1);
+		while (!q.isEmpty() && System.currentTimeMillis() < finishBy+500) {
+			XNodeLight n = q.pop();
+			Integer d = q_d.pop();
 			++nodes_searched;
 			if (machine.isTerminal(n.state)) {
 				++nodes_expanded;
