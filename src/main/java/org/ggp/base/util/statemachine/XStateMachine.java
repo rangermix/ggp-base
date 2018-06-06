@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.lucene.util.OpenBitSet;
+import org.ggp.base.player.gamer.statemachine.FactorPropNet;
 import org.ggp.base.util.gdl.grammar.Gdl;
 import org.ggp.base.util.gdl.grammar.GdlDistinct;
 import org.ggp.base.util.gdl.grammar.GdlFunction;
@@ -56,6 +57,19 @@ public class XStateMachine extends XMachine implements Serializable {
     public OpenIntObjectHashMap gdlSentenceMap;
 
     public transient XORShiftRandom rand;
+
+    public final boolean factor;
+    public transient Role factoredRole;
+
+    public XStateMachine(boolean factor, Role r) {
+    	super();
+    	this.factor = factor;
+    	this.factoredRole = r;
+    }
+
+    public XStateMachine() {
+    	this(false, null);
+    }
 
     public OpenBitSet getCurrentState() {
     	return currentState;
@@ -766,9 +780,16 @@ public class XStateMachine extends XMachine implements Serializable {
 	public void initialize(List<Gdl> description) {
 		// TODO Auto-generated method stub
 		try {
-			System.out.println("Initialized");
-        	description = sanitizeDistinct(description);
-        	prop = OptimizingPropNetFactory.create(description);
+			System.out.println("Initializing..");
+			boolean VERBOSE = false;
+        	prop = OptimizingPropNetFactory.create(description, VERBOSE);
+
+        	if (factor) {
+        		FactorPropNet factoredProp = new FactorPropNet(prop, factoredRole);
+        		List<PropNet> factoredProps = factoredProp.factor();
+        		prop = factoredProps.get(0);
+        	}
+
             propNet = new XPropNet(prop);
 
             compInfo = propNet.getCompInfo();

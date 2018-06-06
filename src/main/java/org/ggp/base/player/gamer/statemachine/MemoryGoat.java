@@ -36,6 +36,7 @@ import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
 
 public class MemoryGoat extends XStateMachineGamer {
 	public static final boolean SAVE_MATCH = false;
+	public static final boolean FACTOR = true;
 
 	protected Player p;
 	private XStateMachine machine;
@@ -86,7 +87,7 @@ public class MemoryGoat extends XStateMachineGamer {
 	public XStateMachine getInitialStateMachine() {
 		XStateMachine machine = loadStateMachine();
 		if (machine == null) {
-			return new XStateMachine();
+			return new XStateMachine(FACTOR, new Role(getRoleName()));
 		}
 		return machine;
 	}
@@ -96,7 +97,7 @@ public class MemoryGoat extends XStateMachineGamer {
 			GoalDefinitionException, InterruptedException, ExecutionException {
 		initialize(timeout);
 
-		int num_rests = (int) ((finishBy - System.currentTimeMillis()) / 1000);
+		int num_rests = (int) ((finishBy - System.currentTimeMillis()) / 1000) - 1;
 		if (num_rests < 0) {
 			return;
 		}
@@ -107,6 +108,10 @@ public class MemoryGoat extends XStateMachineGamer {
 			double num = 10 * num_threads * (avg_back/avg_threadpool);
 			num_per = (int) num;
 			if (num_per < 1) num_per = 1;
+			if (System.currentTimeMillis() > finishBy-600) {
+				num_rests = i+1;
+				break;
+			}
 		}
 		System.out.println("C_CONST: " + hyperparams.C);
 		System.out.println("Depth Charges: " + depthCharges);
@@ -118,37 +123,45 @@ public class MemoryGoat extends XStateMachineGamer {
 		//gather tree shape stats
 		int breadth = 0;
 		int nodes_searched = 1;
-		int nodes_expanded = 1;
 		int depth = 0;
 		Stack<XNodeLight> q = new Stack<XNodeLight>();
 		Stack<Integer> q_d = new Stack<Integer>();
 		q.push(roots[num_roots]);
 		q_d.push(1);
-		while (!q.isEmpty() && System.currentTimeMillis() < finishBy+500) {
+		System.out.println("current time: " + System.currentTimeMillis());
+		System.out.println("time limit: " + finishBy);
+		while (!q.isEmpty() && System.currentTimeMillis() < finishBy+400) {
 			XNodeLight n = q.pop();
 			Integer d = q_d.pop();
 			++nodes_searched;
 			if (machine.isTerminal(n.state)) {
-				++nodes_expanded;
 				depth += d;
 				continue;
 			}
 			breadth += machine.getLegalJointMoves(n.state).size();
 			Collection<XNodeLight> children = n.getChildren(machine, self_index).values();
+			int[] charge_depth = new int[1];
+			machine.performDepthCharge(n.state, charge_depth);
+			depth += charge_depth[0] + d;
 			for (XNodeLight child : children) {
-				q.add(child);
-				q_d.add(d+1);
+				q.push(child);
+				q_d.push(d+1);
 			}
+			//System.out.println(q_d.peek() + " " + q.peek().toString());
 		}
 		double avg_breadth = 1. * breadth / nodes_searched;
-		double avg_depth = 1. * depth / nodes_expanded;
+		double avg_depth = 1. * depth / nodes_searched;
 		double size_est = Math.pow(avg_breadth, avg_depth);
+		double charge_est = depthCharges / getMatch().getStartClock() * getMatch().getPlayClock();
 		System.out.println("breadth ~ " + avg_breadth);
 		System.out.println("depth ~ " + avg_depth);
 		System.out.println("size ~ " + size_est);
+		System.out.println("charge ~ " + charge_est);
+
 
 		thread.suspend();
-		num_roots = (int) (Math.log(size_est) / 2.);
+		//num_roots = (int) (Math.log(size_est) / 2.);
+		num_roots = (int) (Math.sqrt(Math.sqrt(charge_est) / Math.log(size_est)));
 		System.out.println("# roots: " + num_roots);
 		initializeRoots();
 		thread.resume();
@@ -189,7 +202,7 @@ public class MemoryGoat extends XStateMachineGamer {
 		last_depthCharges = 0;
 		thread.start();
 
-		finishBy = timeout - 3000;
+		finishBy = timeout - 2500;
 		System.out.println("NumThreads: " + num_threads);
 	}
 
@@ -210,6 +223,7 @@ public class MemoryGoat extends XStateMachineGamer {
 		rootsAbsolute[rootsAbsolute.length-1] = rootSavedAbsolute;
 		roots[roots.length-1] = rootSavedAbsolute;
 		C_CONST[roots.length-1] = HyperParameters.generateC(128, 1);
+		System.out.println("Initialized " + num_roots + " roots");
 	}
 
 	@Override
@@ -241,7 +255,10 @@ public class MemoryGoat extends XStateMachineGamer {
 				OpenBitSet nextState = machine.getNextState(roots[i].state, jointMove);
 				if (currentState.equals(nextState)) {
 					roots[i] = roots[i].getChildren(machine, self_index).get(jointMove);
-					if (roots[i] == null) System.out.println("NOT IN MAP");
+					if (roots[i] == null) {
+						System.out.println("NOT IN MAP");
+						break;
+					}
 					found_next = true;
 					break;
 				}
@@ -255,18 +272,20 @@ public class MemoryGoat extends XStateMachineGamer {
 		matchPath.add(roots[roots.length-1]);
 
 		//restart the worst root
-		int worstRoot = 0;
-		double worstScore = 100.1;
-		for (int i=0; i < num_roots; ++i) {
-			double utility = roots[i].utility[self_index] / roots[i].updates;
-			if (utility < worstScore) {
-				worstRoot = i;
-				worstScore = utility;
+		if (roots.length > 1) {
+			int worstRoot = 0;
+			double worstScore = 100.1;
+			for (int i=0; i < num_roots; ++i) {
+				double utility = roots[i].utility[self_index] / roots[i].updates;
+				if (utility < worstScore) {
+					worstRoot = i;
+					worstScore = utility;
+				}
 			}
+			System.out.println("Restarting Root at index " + worstRoot);
+			roots[worstRoot] = generateXNode(currentState, roles.size(), worstRoot);
+			C_CONST[worstRoot] = HyperParameters.generateC(hyperparams.C, hyperparams.C/4);
 		}
-		System.out.println("Restarting Root at index " + worstRoot);
-		roots[worstRoot] = generateXNode(currentState, roles.size(), worstRoot);
-		C_CONST[worstRoot] = HyperParameters.generateC(hyperparams.C, hyperparams.C/4);
 	}
 
 	protected Move MCTS() throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException, InterruptedException, ExecutionException {
@@ -284,6 +303,10 @@ public class MemoryGoat extends XStateMachineGamer {
 			double num = 10 * num_threads * (avg_back/avg_threadpool);
 			num_per = (int) num;
 			if (num_per < 1) num_per = 1;
+			if (System.currentTimeMillis() > finishBy-400) {
+				num_rests = i+1;
+				break;
+			}
 		}
 		System.out.println("C_CONST: " + hyperparams.C);
 		System.out.println("Depth Charges: " + depthCharges);
