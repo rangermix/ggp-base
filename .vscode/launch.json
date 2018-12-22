@@ -1,0 +1,405 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug (Launch)",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-ExampleLegalPlayer",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "ExampleLegalPlayer",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-EndgameCaseGenerator",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.benchmark.EndgameCaseGenerator",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-ImportSanchoCases",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.benchmark.ImportSanchoCases",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-PlayerTester",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.benchmark.PlayerTester",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-ClojureConsole",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.consoles.ClojureConsole",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-PythonConsole",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.consoles.PythonConsole",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Kiosk",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.kiosk.Kiosk",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-LogSummarizer",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.logging.LogSummarizer",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-IIPlayer",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.player.IIPlayer",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Player",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.player.Player",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-PlayerRunner",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.player.PlayerRunner",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-ProxiedPlayerRunner",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.player.ProxiedPlayerRunner",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-MatchArchiveProcessor",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.research.MatchArchiveProcessor",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-IIServer",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.server.IIServer",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Server",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.server.Server",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-VisualizationPanel",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.server.visualization.VisualizationPanel",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-TiltyardRequestFarm",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.tiltyard.TiltyardRequestFarm",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-GameServerRunner",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.utilities.GameServerRunner",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-SimpleGameSim",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.utilities.SimpleGameSim",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-BatchValidator",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.validator.BatchValidator",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Validator",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.apps.validator.Validator",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-GamePlayer",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.player.GamePlayer",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-IIGamePlayer",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.player.IIGamePlayer",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-PollingGamePlayer",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.player.PollingGamePlayer",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-ProxyGamePlayerClient",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.player.proxy.ProxyGamePlayerClient",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-NoTabsInRulesheetsTest",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.test.NoTabsInRulesheetsTest",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-GamerConfiguration",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.util.configuration.GamerConfiguration",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-BaseCryptography",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.util.crypto.BaseCryptography",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-CloudGameRepository",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.util.game.CloudGameRepository",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-GameFlowTester",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.util.gdl.model.GameFlowTester",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-TransformTester",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.util.gdl.transforms.TransformTester",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-StandaloneDeORer",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.util.gdl.transforms.standalone.StandaloneDeORer",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-StandaloneVariableConstrainer",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.util.gdl.transforms.standalone.StandaloneVariableConstrainer",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-PropNetAnnotater",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.util.propnet.factory.annotater.PropNetAnnotater",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-PropNetFlattener",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.util.propnet.factory.flattener.PropNetFlattener",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-ProjectSearcher",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.util.reflection.ProjectSearcher",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-BasesInputsValidator",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.validator.BasesInputsValidator",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-StaticValidator",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "org.ggp.base.validator.StaticValidator",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Attach)",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": "<debug port of remote debuggee>"
+        }
+    ]
+}

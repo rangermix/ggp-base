@@ -111,16 +111,18 @@ public final class GamePlayer extends AbstractGamePlayer
 	// so that the GamePlayer class doesn't have to import RandomGamer.
 	public static void main(String[] args)
 	{
+		int port;
 		if (args.length != 1) {
-			System.err.println("Usage: GamePlayer <port>");
-			System.exit(1);
+			port = 9147;
+		} else {
+			port = Integer.valueOf(args[0]);
 		}
 
 		try {
-			GamePlayer player = new GamePlayer(Integer.valueOf(args[0]), new RandomGamer());
+			GamePlayer player = new GamePlayer(port, new RandomGamer());
 			player.run();
 		} catch (NumberFormatException e) {
-			System.err.println("Illegal port number: " + args[0]);
+			System.err.println("Illegal port number: " + port);
 			e.printStackTrace();
 			System.exit(2);
 		} catch (IOException e) {
